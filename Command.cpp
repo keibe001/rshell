@@ -5,8 +5,10 @@ using namespace std;
 
 
 /*
-    should probably move validity back to Command.h as a private variable
+1.  should probably move validity back to Command.h as a private variable
     shouldn't matter though
+2.  probably don't need the semi-colon class
+3.  find out if connectors work like they should, or how it's written
 */
 
 class normalCommand: public Command
@@ -16,7 +18,7 @@ class normalCommand: public Command
     public:
         normalCommand(string s)
         {
-            //use syscall to execute
+            //use syscall to execute (DO NOT USE SYSTEM)
             //also "exit"
             //set validity (true if it executes properly, false otherwise)
         };
