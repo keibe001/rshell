@@ -8,7 +8,7 @@ class Command
     public:
         Command();
         virtual bool valid() = 0;
-        
+        virtual bool type() = 0;
     private:
         
 };
