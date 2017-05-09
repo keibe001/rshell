@@ -93,12 +93,12 @@ int main()
         v.push_back(com);
         bool checker = false;
         
-        //remove this
-        cout<<"input # size: " << v.size()<<endl;
-        if(v.size() == 1)
-        {
-            cout<<"["<<v.at(0)<<"]"<<endl;
-        }
+        // //remove this
+        // cout<<"input # size: " << v.size()<<endl;
+        // if(v.size() == 1)
+        // {
+        //     cout<<"["<<v.at(0)<<"]"<<endl;
+        // }
         
         for(int i = 0; i< v.size(); i++)                         //read through v 
         {
