@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 using namespace std;
 
 #include <iostream>
@@ -179,3 +180,5 @@ int main()
             //         left = v.at(i+1);
             //     }
             // }
+=======
+>>>>>>> c0385554bf2f21aaf0c4842c7f58577bae7f8f0e
