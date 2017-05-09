@@ -1,4 +1,3 @@
-// <<<<<<< HEAD
 using namespace std;
 
 #include <iostream>
@@ -15,7 +14,6 @@ using namespace std;
 #include "Command.h"                      
 #include "Connector.h"
 #include "Connector.cpp"
-// #include "Command.cpp"   
 
 
 
