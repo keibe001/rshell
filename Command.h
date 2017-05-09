@@ -1,27 +1,22 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <iostream>
 #include <string>
+using namespace std;
 
-class Command
-{
-    public:
-        Command();
-        virtual bool valid() = 0;
-        virtual bool type() = 0;
+class Command {
+    
     private:
+        string input;
+        bool validity; 
+        int status; 
+    public:
+        Command(string command);
+        void launch();
+        bool isValid();
+        int getStatus();
         
 };
 
-
-
-
-
-
-
-
-
-
-
-
-#endif
+#endif 
