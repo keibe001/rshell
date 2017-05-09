@@ -8,36 +8,54 @@ using namespace std;
 #include <sys/types.h>  // type definitions, e.g., pid_t
 #include <sys/wait.h>   // wait()
 #include <signal.h>     // signal name constants and kill()
-
+#include <boost/algorithm/string.hpp>   // boost::trim_left(string s);
 
 //Here goes the #include "files"
-// #include "Command.h"                         //add in back later
+#include "Command.h"                      
+#include "Connector.h"
+#include "Connector.cpp"
+// #include "Command.cpp"   
 
 
+
+/*
+#include "command.h"                        //jose's main.cpp
+
+int main() {
+    
+    string s = "";
+    
+    cout << "$: "; 
+    getline(cin, s);
+    
+    Command input(s);
+    input.launch();
+    
+    return 0;
+}
+*/
 
 
 
 /*
 1.  add error checks for consecutive connectors (;; should be fine?)
-2.  || only works when the first fials
-3.  fix the & and || so that they only execute the second command depending on the outcome of the first
-4.  make v a vector of strings that pass them into the command in the second for loop  
+
 5.  syntax ERROR: "bash: syntax error near unexpected token `||'"
+
+ls; lsf && echo a; echo a; && lsf; lfs || echo a && echo b; echo a || lsf && echo b
 */
 
 
 
 int main()
 {
-    string input = "";
-    // bool flag = true;
+    
     while(true)                                     //each newline
     {
+        string input = "";
         string com = "";                          //each command
-        cout << " $ ";
-        // cin >> input;
+        cout << "$ ";
         getline (cin,input);
-        // if (input == !cin.eof())
         vector <string> v;                        //vector of inputs: normal, &&, ||, ;
         for(int i = 0; i < input.size(); i++)       //reads input
         {
@@ -48,10 +66,6 @@ int main()
             }
             if(input.at(i) == ';')
             {
-                //Command* A = new normalCommand(com);
-                // v.push_back(A);
-                // Command* B = new semiColonConnector();
-                // v.push_back(B);
                 v.push_back(com);
                 v.push_back(";");
                 com = "";
@@ -61,10 +75,6 @@ int main()
                 if(i < input.size()-1 && input.at(i) == '&' && input.at(i+1)=='&')  //&&
                 {
                     i++;
-                    // Command* A = new normalCommand(com);
-                    // v.push_back(A);
-                    // Command* B = new andConnector();
-                    // v.push_back(B);
                     v.push_back(com);
                     v.push_back("&&");
                     com = "";
@@ -72,10 +82,6 @@ int main()
                 else if(i < input.size()-1 && input.at(i) == '|' && input.at(i+1)=='|')     //||
                 {
                     i++;
-                    // Command* A = new normalCommand(com);
-                    // v.push_back(A);
-                    // Command* B = new orConnector();
-                    // v.push_back(B);
                     v.push_back(com);
                     v.push_back("||");
                     com = "";
@@ -85,52 +91,61 @@ int main()
             }
         }
         v.push_back(com);
-        // Command* left = v.at(0);
-        // vector <Command*> C; 
-        cout<<"Size: " <<v.size()<<endl;
+        bool checker = false;
+        
+        //remove this
+        cout<<"input # size: " << v.size()<<endl;
+        if(v.size() == 1)
+        {
+            cout<<"["<<v.at(0)<<"]"<<endl;
+        }
+        
         for(int i = 0; i< v.size(); i++)                         //read through v 
         {
-            // cout<<"Inside for loop"<<endl;
+            if(v.at(i) == "exit")
+            {
+                return 0;
+            }
             if(v.at(i) == ";")
             {
-                //do nothing or pass into C
-                cout<<v.at(i)<<endl;
+                //  cout<<"SEMI"<<endl;
             }
             else if(v.at(i) == "&&")
             {
-                // Command* B = new andConnector();
-                // C.push_back(B);
-                /*
-                check validity of the statement before, only execute if the first one works
-                */
-                cout<<v.at(i)<<endl;
+                boost::trim_left(v.at(i+1));
+                // cout<<"&&: ["<< v.at(i+1)<<"]"<<endl;
+                andConnector* a = new andConnector(checker, v.at(i+1));
+                i++;
+                checker = a->getValidity();              //truth value of &&
+                // cout<<v.at(i)<<endl;
             }
             else if(v.at(i) == "||")
             {
-                // Command* B = new orConnector();
-                // v.push_back(B);
-                /*
-                checks validity of the statement before, only executes if the first one fails
-                */
-                cout<<v.at(i)<<endl;
+                boost::trim_left(v.at(i+1));
+                // cout<<"||: ["<< v.at(i+1)<<"]"<<endl;
+                orConnector* o = new orConnector(checker, v.at(i+1));
+                i++;
+                checker = o->getValidity();
             }
             else
             {
-                //Command* A = new normalCommand(com);
-                // v.push_back(A);
-                /*
-                remove whitespace?
-                */
+                
+                boost::trim_left(v.at(i));
+                
                 if(v.at(i) == "exit")
                 {
-                    cout<<"exited"<<endl;
+                    // cout<<"exited"<<endl;
                     return 0;
                 }
-                cout<<v.at(i)<<endl;
+                
+                cout<<"Whats entering: " << v.at(i)<<endl;
+                Command c(v.at(i));
+                c.launch();
+                checker = c.isValid();
+                // cout<<v.at(i)<<endl;
             }
-            // cout<<"Outside for loop"<<endl;
+
         }
-        // flag = false;
     }
     return 0;
 }
