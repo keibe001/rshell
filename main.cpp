@@ -11,7 +11,7 @@ using namespace std;
 
 
 //Here goes the #include "files"
-// #include "Command.h"                         //add in back later
+#include "Command.h"                         //add in back later
 
 
 
@@ -30,6 +30,7 @@ using namespace std;
 int main()
 {
     string input = "";
+    Command(input).launch();
     // bool flag = true;
     while(true)                                     //each newline
     {
