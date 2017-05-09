@@ -43,7 +43,7 @@ int main() {
 
 5.  syntax ERROR: "bash: syntax error near unexpected token `||'"
 
-ls; lsf && echo a; echo a; && lsf; lfs || echo a && echo b; echo a || lsf && echo b
+ls; lsf && echo a; echo a && lsf; lfs || echo a && echo b; echo a || lsf && echo b
 */
 
 
@@ -91,15 +91,20 @@ int main()
                     com += input.at(i);               //adds to the string to be read
             }
         }
+        cin.clear();
         v.push_back(com);
         bool checker = false;
         
-        // //remove this
-        // cout<<"input # size: " << v.size()<<endl;
-        // if(v.size() == 1)
-        // {
-        //     cout<<"["<<v.at(0)<<"]"<<endl;
-        // }
+
+        
+        if(v.at(0) == "exit")                           //manuel fix of troublesome bug
+        {
+            // cout<<"exit is the first command entered"<<endl;
+            return 0;
+            cout<<"You've discovered a big bug, keep typing \"exit\" ";
+            cout<< "and it will probably fix itself"<<endl;
+        }
+
         
         for(int i = 0; i< v.size(); i++)                         //read through v 
         {
