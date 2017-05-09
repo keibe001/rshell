@@ -1,154 +1,96 @@
-
-using namespace std;
-
 #include "Command.h"
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <stdio.h>
+#include<stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
+Command::Command(string command) {
+    input = command;
+}
 
-/*
-1.  should probably move validity back to Command.h as a private variable
-    shouldn't matter though
-2.  probably don't need the semi-colon class
-3.  find out if connectors work like they should, or how it's written
-*/
+void Command::launch() { 
 
-class normalCommand: public Command
-{
-    private:
-        bool validity;
-    public:
-        normalCommand(string s)
-        {
-            //use syscall to execute (DO NOT USE SYSTEM)
-            //also "exit"
-            //set validity (true if it executes properly, false otherwise)
-        };
-        bool valid()
-        {
-            return validity;
-        };
-        int type();
-        {
-            return 1;
-        };
-};
-
-class andConnector: public Command                          // &&
-{
-    private:
-        bool validity;
-        Command* l;
-        Command* r;
-    public:
-        andConnector()      //Command* l, Command* r
-        {
-            
-        };
-        bool valid()
-        {
-            return validity;
-        };
-        int type();
-        {
-            return 2;
-        };
-        void set(Command* left, Command* right)
-        {
-            l = left;
-            r = right;
-            if(l->valid() && r->valid())
-            {
-                validity = true;
-            }
-            else
-            {
-                 validity = false;
-            }
+    if (input == "exit") {
+        return; 
+    }
+    
+    char** command_arr = new char*[500];
+    string command_copy = input.substr(0,input.find(" "));
+    
+    char *command_copy_2 = new char[input.length()]; 
+    char *command_copy_3 = new char[input.length()];
+    strcpy(command_copy_2,command_copy.c_str());
+    
+    int x = 0; 
+    while (input.find(" ") < 500) { // while no whitespace found
+        if(x == 0) {
+            command_arr[x] = command_copy_2;
+            x++;
         }
-};
-
-class orConnector: public Command                           // ||
-{
-    private:
-        bool validity;
-        Command* l;
-        Command* r;
-    public:
-        orConnector()       //Command* l, Command* r
-        {
-            
-        };
-        bool valid()
-        {
-            return validity;
-        };
-        int type();
-        {
-            return 3;
-        };
-        void set(Command* left, Command* right)
-        {
-            l = left;
-            r = right;
-            if(!l->valid() && !r->valid())
-            {
-                 validity = false;
-            }
-            else
-            {
-                 validity = true;
-            }
+        
+        else {
+        command_copy = input.substr(0, input.find(" ")); 
+            strcpy(command_copy_3, command_copy.c_str());
+            command_arr[x] = command_copy_3; 
+            x++;
         }
-};
+        
+        input.erase(0,input.find(" ") + 1);
+    }
+    
+    if(!input.empty()) {
+        command_copy = input;
+        char *cmd = new char[input.length()];
+        strcpy(cmd,command_copy.c_str());
+        command_arr[x] = cmd;
+    }
+    
+    command_arr[x+1] = 0; 
+    pid_t pid = fork(); 
+    int pidnum = 1; 
+    
+    //checks if processes output correctly 
+    if (pid == -1) {
+        perror("Fork failed");
+        pidnum = -1; 
+        status = pidnum;
+    }
+    
+    else if (pid == 0 && execvp(command_copy_2, command_arr)) {
+        perror("Execute failed");
+        pidnum = -1; 
+        status = pidnum;
+        return;
+    }
+    
+    else if (pid > 0) {
+        if (wait(0) == -1) {
+            perror("Wait failed"); 
+            pidnum = -1;
+            status = pidnum;
+        }
+    }
+    
+    delete[] command_arr;
+    delete[] command_copy_2;
+    delete[] command_copy_3;
+    status = pidnum;
+    return; 
+}
 
+bool Command::isValid() {
+    if(getStatus() == 1) {
+        validity = true; 
+        return validity;
+    }
+    
+    validity = false;
+    return validity;
+}
 
-class semiColonConnector: public Command                    // ;
-{
-    // private:
-    //     bool validity;
-    public:
-        semiColonConnector()
-        {
-            
-        };
-        bool valid()
-        {
-            return false;                                   // this is an error
-        };
-        int type();
-        {
-            return 4;
-        };
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+int Command::getStatus() {
+    return status;
+}
