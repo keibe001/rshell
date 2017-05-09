@@ -1,8 +1,6 @@
 #!/bin/bash
-echo
-g++ main.cpp Command.cpp Connector.cpp
-./a.out
-# echo "$input" | ./a.out
-# echo "exit" | ./a.out
-# ./a.out < "exit" >  #"output.txt"
-# exit
+exit #just exit
+echo A && exit #A
+echo A || exit #A, testdone
+echo A; exit #A
+echo A #exit #A, testdone
