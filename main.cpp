@@ -139,7 +139,7 @@ int main()
                     return 0;
                 }
                 
-                cout<<"Whats entering: " << v.at(i)<<endl;
+                // cout<<"Whats entering: " << v.at(i)<<endl;
                 Command c(v.at(i));
                 c.launch();
                 checker = c.isValid();
@@ -160,25 +160,3 @@ int main()
 
 
 
-
-
-
-
-
-
-
-            // if(v.at(i)->type() == 2 || v.at(i)->type() == 3)    //v.at(i) is a connector
-            // {
-            //     //add error checks later
-            //     v.at(i)->set(left,v.at(i+1));
-            //     left = v.at(i);             //this is now the left most operator
-            // }
-            // if(v.at(i)->type() == 4)    //v.at(i) is a semi-colon;
-            // {
-            //     if(i < v.size() -1)
-            //     {
-            //         left = v.at(i+1);
-            //     }
-            // }
-=======
->>>>>>> c0385554bf2f21aaf0c4842c7f58577bae7f8f0e
