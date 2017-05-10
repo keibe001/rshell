@@ -15,31 +15,11 @@ using namespace std;
 #include "Connector.h"
 #include "Connector.cpp"
 
-// stuff
-
-/*
-#include "command.h"                        //jose's main.cpp
-
-int main() {
-    
-    string s = "";
-    
-    cout << "$: "; 
-    getline(cin, s);
-    
-    Command input(s);
-    input.launch();
-    
-    return 0;
-}
-*/
 
 
 
 /*
-1.  add error checks for consecutive connectors (;; should be fine?)
 
-5.  syntax ERROR: "bash: syntax error near unexpected token `||'"
 
 ls; lsf && echo a; echo a && lsf; lfs || echo a && echo b; echo a || lsf && echo b
 */
@@ -60,8 +40,7 @@ int main()
         {
             if(input.at(i) == '#')                  //comments out the rest
             {
-                break;                  //need to double check if it still 
-                                        //works if you type \# or somehting
+                break;                  
             }
             if(input.at(i) == ';')
             {
@@ -91,62 +70,42 @@ int main()
         }
         cin.clear();
         v.push_back(com);
-        bool checker = false;
-        
+        bool checker = false;                           //last command's truth value
 
-        
-        if(v.at(0) == "exit")                           //manuel fix of troublesome bug
-        {
-            // cout<<"exit is the first command entered"<<endl;
-            return 0;
-            cout<<"You've discovered a big bug, keep typing \"exit\" ";
-            cout<< "and it will probably fix itself"<<endl;
-        }
-
-        
         for(int i = 0; i< v.size(); i++)                         //read through v 
         {
-            if(v.at(i) == "exit")
+            if(v.at(i) == "exit" )
             {
                 return 0;
             }
             if(v.at(i) == ";")
             {
-                //  cout<<"SEMI"<<endl;
+                
             }
-            else if(v.at(i) == "&&")
+            else if(v.at(i) == "&&" )
             {
                 boost::trim_left(v.at(i+1));
-                // cout<<"&&: ["<< v.at(i+1)<<"]"<<endl;
                 andConnector* a = new andConnector(checker, v.at(i+1));
-                i++;
+                i++;                                   //skips v.at(i+1)
                 checker = a->getValidity();              //truth value of &&
-                // cout<<v.at(i)<<endl;
             }
-            else if(v.at(i) == "||")
+            else if(v.at(i) == "||" )
             {
                 boost::trim_left(v.at(i+1));
-                // cout<<"||: ["<< v.at(i+1)<<"]"<<endl;
                 orConnector* o = new orConnector(checker, v.at(i+1));
-                i++;
-                checker = o->getValidity();
+                i++;                                    //skips v.at(i+1)
+                checker = o->getValidity();             //truth value of ||
             }
-            else
+            else if( !ignore)
             {
-                
                 boost::trim_left(v.at(i));
-                
                 if(v.at(i) == "exit")
                 {
-                    // cout<<"exited"<<endl;
                     return 0;
                 }
-                
-                // cout<<"Whats entering: " << v.at(i)<<endl;
                 Command c(v.at(i));
                 c.launch();
                 checker = c.isValid();
-                // cout<<v.at(i)<<endl;
             }
 
         }
