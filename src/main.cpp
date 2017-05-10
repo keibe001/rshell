@@ -96,7 +96,7 @@ int main()
                 i++;                                    //skips v.at(i+1)
                 checker = o->getValidity();             //truth value of ||
             }
-            else if( !ignore)
+            else
             {
                 boost::trim_left(v.at(i));
                 if(v.at(i) == "exit")
