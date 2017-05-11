@@ -14,6 +14,7 @@ using namespace std;
 #include "Command.h"                      
 #include "Connector.h"
 #include "Connector.cpp"        //and / or
+#include "Command.cpp"
 
 
 
@@ -36,7 +37,7 @@ int main()
         cout << "$ ";
         getline (cin,input);
         vector <string> v;                        //vector of inputs: normal, &&, ||, ;
-        for(int i = 0; i < input.size(); i++)       //reads input
+        for(unsigned i = 0; i < input.size(); i++)       //reads input
         {
             if(input.at(i) == '#')                  //comments out the rest
             {
@@ -72,7 +73,7 @@ int main()
         v.push_back(com);
         bool checker = false;                           //last command's truth value
 
-        for(int i = 0; i< v.size(); i++)                         //read through v 
+        for(unsigned i = 0; i< v.size(); i++)                         //read through v 
         {
             if(v.at(i) == "exit" )
             {
