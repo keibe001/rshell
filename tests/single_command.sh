@@ -1,7 +1,7 @@
 #!/bin/sh
 ls
 ls -al
-ls -j
+ls -i
 echo A
 echo AB CD
 help help
