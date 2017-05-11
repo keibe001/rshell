@@ -16,3 +16,4 @@ will result in having to use the exit command approximately 8 times. Typing in n
 3. There are no syntax checkers, so it reads a single connector (| or &) has a word  <br /> ex) "$ echo a | echo b" gives you "echo echo echo b" 
 4. Having three connectors (&&&) also creates an error, and it will execute the first one but not the following because it would pass the final '&' along to Command::launch()
 5. Having two semi-colon's together also creates an error because it pushes an empty string onto the vector of strings that are passed into the Command::launch().
+6. Just typeing enter on the command line gives you "Execute failed: No such file or directory"
