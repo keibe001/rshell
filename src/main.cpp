@@ -1,5 +1,3 @@
-<<<<<<< HEAD:main.cpp
-=======
 using namespace std;
 
 #include <iostream>
@@ -15,7 +13,7 @@ using namespace std;
 //Here goes the #include "files"
 #include "Command.h"                      
 #include "Connector.h"
-#include "Connector.cpp"
+#include "Connector.cpp"        //and / or
 
 
 
@@ -124,4 +122,3 @@ int main()
 
 
 
->>>>>>> 6760ad2db75a16565205c1fac76fa8c3865b016c:src/main.cpp
