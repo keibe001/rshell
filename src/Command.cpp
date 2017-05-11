@@ -14,10 +14,10 @@ Command::Command(string command) {
 void Command::launch() { 
 
     if (input == "exit") {
-        return; 
+        abort(); 
     }
     
-    char** command_arr = new char*[500];
+    char** command_arr = new char*[1000];
     string command_copy = input.substr(0,input.find(" "));
     
     char *command_copy_2 = new char[input.length()]; 
@@ -25,7 +25,7 @@ void Command::launch() {
     strcpy(command_copy_2,command_copy.c_str());
     
     int x = 0; 
-    while (input.find(" ") < 500) { // while no whitespace found
+    while (input.find(" ") < 1000) { // while no whitespace found
         if(x == 0) {
             command_arr[x] = command_copy_2;
             x++;
@@ -46,6 +46,7 @@ void Command::launch() {
         char *cmd = new char[input.length()];
         strcpy(cmd,command_copy.c_str());
         command_arr[x] = cmd;
+        delete[] cmd;
     }
     
     command_arr[x+1] = 0; 
