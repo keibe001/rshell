@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 exit #just exit
 echo A && exit #A
 echo A || exit #A, testdone

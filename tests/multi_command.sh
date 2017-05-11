@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 echo A && echo B
 echo A || echo B
 echo A; echo B

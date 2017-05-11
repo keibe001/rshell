@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 ls
 ls -al
 ls -j
