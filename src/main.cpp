@@ -20,8 +20,6 @@ using namespace std;
 
 
 /*
-
-
 ls; lsf && echo a; echo a && lsf; lfs || echo a && echo b; echo a || lsf && echo b
 */
 
@@ -29,20 +27,15 @@ ls; lsf && echo a; echo a && lsf; lfs || echo a && echo b; echo a || lsf && echo
 
 int main()
 {
-    bool terminate = false;
-    cout<<"START"<<endl;
-    while(!terminate)                                     //each newline
+    
+    while(true)                                     //each newline
     {
         string input = "";
         string com = "";                          //each command
         cout << "$ ";
         getline (cin,input);
         vector <string> v;                        //vector of inputs: normal, &&, ||, ;
-        if(terminate)
-        {
-            break;
-        }
-        for(unsigned i = 0; i < input.size() && !terminate; i++)       //reads input
+        for(unsigned i = 0; i < input.size(); i++)       //reads input
         {
             if(input.at(i) == '#')                  //comments out the rest
             {
@@ -58,6 +51,11 @@ int main()
             {
                 if(i < input.size()-1 && input.at(i) == '&' && input.at(i+1)=='&')  //&&
                 {
+                    if(i<input.size()-2 && input.at(i+2) == '&')
+                    {
+                        cout<<"bash: syntax error near unexpected token `&'"<<endl;
+                        break;
+                    }
                     i++;
                     v.push_back(com);
                     v.push_back("&&");
@@ -65,6 +63,11 @@ int main()
                 }
                 else if(i < input.size()-1 && input.at(i) == '|' && input.at(i+1)=='|')     //||
                 {
+                    if(i<input.size()-2 && input.at(i+2) == '|')
+                    {
+                        cout<<"bash: syntax error near unexpected token `|'"<<endl;
+                        break;
+                    }
                     i++;
                     v.push_back(com);
                     v.push_back("||");
@@ -75,70 +78,46 @@ int main()
             }
         }
         cin.clear();
-        cout<<"Input Size: "<<input.size()<<endl;
         v.push_back(com);
-        com = "";
         bool checker = false;                           //last command's truth value
 
-        for(unsigned i = 0; i< v.size() && !terminate; i++)                         //read through v 
+        for(unsigned i = 0; i< v.size(); i++)                         //read through v 
         {
-            cout<<">>>>>>>> "<< v.at(i)<<" <<<<<<<<<"<<endl;
-            if(v.at(i) == "exit" || terminate)
+            if(v.at(i) == "exit" )
             {
-                cout<<"EXIT"<<endl;
-                terminate = true;
                 return 0;
             }
-            else if(v.at(i) == ";")
+            if(v.at(i) == ";")
             {
                 
             }
-            else if(v.at(i) == "&&" && !terminate)
+            else if(v.at(i) == "&&" )
             {
                 boost::trim_left(v.at(i+1));
                 andConnector* a = new andConnector(checker, v.at(i+1));
                 i++;                                   //skips v.at(i+1)
                 checker = a->getValidity();              //truth value of &&
             }
-            else if(v.at(i) == "||" && !terminate)
+            else if(v.at(i) == "||" )
             {
                 boost::trim_left(v.at(i+1));
                 orConnector* o = new orConnector(checker, v.at(i+1));
                 i++;                                    //skips v.at(i+1)
                 checker = o->getValidity();             //truth value of ||
             }
-            else if(!terminate)
+            else
             {
                 boost::trim_left(v.at(i));
                 if(v.at(i) == "exit")
                 {
-                    terminate = true;
                     return 0;
                 }
                 Command c(v.at(i));
                 c.launch();
                 checker = c.isValid();
             }
-            else
-            {
-                cout<<"TERMINATE"<<endl;
-                return 0;
-            }
-        }
-        if(terminate)
-        {
-            break;
+
         }
     }
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
