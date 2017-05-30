@@ -15,3 +15,4 @@ Parenthesis make commands execute based on where the commands are relative to th
 1. Any attempts to exit within .sh files do not execute, but when typing exit in the terminal, it exits immediately
 2. Entering the [] test command without a space before the ] causes a segmentation fault.
 3. The output (True)/(False) of the test commands do not output in the .sh files, but when the command is entered individually, the output appears
+4. Uneven amount of parenthesis throws out of range error
