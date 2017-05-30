@@ -7,4 +7,8 @@ echo A3 #&& echo B
 echo A && echo B #&& echo C
 echo A #; echo B
 echo A #|| echo B
+<<<<<<< HEAD
 echo Hello World #
+=======
+exit
+>>>>>>> 45264ffa6b5251f6d4f1f3584f7b5f16ca5164ba
