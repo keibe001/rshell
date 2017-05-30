@@ -1,29 +1,51 @@
-#ifndef CONNECTOR_H
+#ifndef CONNECTOR_H  
 #define CONNECTOR_H
 
-// #include "command.h"
+#include "Base.h"
 
-#include <iostream>
-#include <string>
-using namespace std;
-
-class Connector {
-    
-    private:
-        bool left;
-        string right;
-        
+class Connector : public Base {
     protected:
-        bool self;
+        Base* left;
+        Base* right;
+    
+    public:
+        Connector();
+        Connector(Base* left, Base* right);
+        virtual bool run() = 0;
+};
+
+class andConnector : public Connector {
+    protected:
+        Base* left;
+        Base* right;
         
     public:
-        Connector(bool l, string s )
-        {
-            left = l;
-            right = s;
-        }
-        virtual bool getValidity() = 0;
+        andConnector(Base* left, Base* right);
+        bool run();
+};
+
+class SemiConnector : public Connector {
+    protected:
+        Base* left;
+        Base* right;
+        bool hasRight;
+        
+    public:
+        SemiConnector(Base* left);
+        SemiConnector(Base* left, Base* right);
+        bool run();
 
 };
 
-#endif 
+class orConnector : public Connector {
+    protected:
+        Base* left;
+        Base* right;
+        
+    public:
+        orConnector(Base* left, Base* right);
+        bool run();
+};
+
+
+#endif

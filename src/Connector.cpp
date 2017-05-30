@@ -1,80 +1,70 @@
-#ifndef CONNECTOR_CPP
-#define CONNECTOR_CPP
-
-#include "Command.h"
 #include "Connector.h"
 
-using namespace std;
-#include <iostream>
-#include <vector>
-#include <list>
+Connector::Connector() {} 
 
-//   VectorContainer(Sort* function):Container(function){};
+andConnector::andConnector(Base* left, Base* right) {
+    this->left = left;
+    this->right = right;
+}
 
-
-class andConnector: public Connector
-{
-    private:
-    
-    public:
-
-        andConnector(bool l, string s) : Connector(l,s)
-        {
-            // left = l;
-            // right = s;
-            self = false;
-            if(l)
-            {
-                Command input(s);
-                input.launch();
-                self = (l && input.isValid() );
-            }
-
-            //input.getValidity()
-            
-        };
-        
-        bool getValidity()
-        {
-            return self;
+bool andConnector::run() {
+    if (this->left->run()) {
+        if (this->right->run()) {
+            return true;
         }
-};
-
-
-class orConnector: public Connector
-{
-    private:
+    }
     
-    public:
+    return false;
+}
 
-        orConnector(bool l, string s) : Connector(l,s)
-        {
-            // left = l;
-            // right = s;
-            self = l;
-            if(!l)
-            {
-                Command input(s);
-                input.launch();
-                self = (l || input.isValid() );
-            }
-            //input.getValidity()
-            
-        };
-        
-        bool getValidity()
-        {
-            return self;
+Connector::Connector(Base* left, Base* right) {
+    this->left = left;
+    this->right = right;
+}
+
+SemiConnector::SemiConnector(Base* left, Base* right) {
+    this->left = left;
+    this->right = right;
+    hasRight = true;
+}
+
+SemiConnector::SemiConnector(Base* left) {
+    this->left = left;
+    hasRight = false;
+}
+
+bool SemiConnector::run() {
+    this->left->run();
+    
+    if (hasRight) {
+        if (this->right->run()) {
+            return true;
         }
-};
+        else {
+            return false;
+        }
+    }
+    
+    return true;
+    
+}
 
+orConnector::orConnector(Base* left, Base* right) {
+    this->left = left;
+    this->right = right;
+}
 
-
-
-
-
-
-
-
-
-#endif 
+bool orConnector::run() {
+    if (this->left->run() == false) {
+        if (this->right->run()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return true;
+    }
+    return false;
+}

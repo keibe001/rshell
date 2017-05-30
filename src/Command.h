@@ -1,22 +1,17 @@
-#ifndef COMMAND_H
+#ifndef COMMAND_H   
 #define COMMAND_H
 
-#include <iostream>
-#include <string>
-using namespace std;
+#include "Base.h" 
 
-class Command {
+class Command : public Base {
+    protected: 
+        string command;
+        vector<char*> user_flags;
     
-    private:
-        string input;
-        bool validity; 
-        int status; 
     public:
+        Command();
         Command(string command);
-        void launch();
-        bool isValid();
-        int getStatus();
-        
+        bool run();
 };
 
-#endif 
+#endif

@@ -1,125 +1,200 @@
-using namespace std;
-
-#include <iostream>
-#include <string>
-#include <vector>
-//need these?
-#include <unistd.h>     // getpid(), getcwd()
-#include <sys/types.h>  // type definitions, e.g., pid_t
-#include <sys/wait.h>   // wait()
-#include <signal.h>     // signal name constants and kill()
-#include <boost/algorithm/string.hpp>   // boost::trim_left(string s);
-
-//Here goes the #include "files"
-#include "Command.h"                      
-#include "Connector.h"
-#include "Connector.cpp"        //and / or
+#include "Base.h"
 #include "Command.cpp"
+#include "Connector.cpp"
+#include "r_shell.cpp"
+#include "TestCommand.cpp"
 
-
-
-
-/*
-
-
-ls; lsf && echo a; echo a && lsf; lfs || echo a && echo b; echo a || lsf && echo b
-*/
-
-
-
-int main()
-{
+Base* launch(const vector<string>& cmd) {
+    string x = "";
+    string tempcmd = "";
+    vector<string> seperate;
+    vector<string> comm; 
+    r_shell rshell;
+    Base* root;
+    bool right = false;
     
-    while(true)                                     //each newline
-    {
-        string input = "";
-        string com = "";                          //each command
-        cout << "$ ";
-        getline (cin,input);
-        vector <string> v;                        //vector of inputs: normal, &&, ||, ;
-        for(unsigned i = 0; i < input.size(); i++)       //reads input
-        {
-            if(input.at(i) == '#')                  //comments out the rest
-            {
-                break;                  
+    for (unsigned i = 0; i < cmd.size(); ++i) {
+        if (right) {
+            right = false;
+        }
+        else if (cmd.at(i) == "&&") {
+            if (cmd.at(i + 1).at(0) == '(') {
+                x = cmd.at(i + 1);
+                x = x.substr(1, x.size() - 2);
+                rshell.parse(x, seperate);
+                rshell.compareCommands(seperate, comm);
+                andConnector* a = new andConnector(root,launch(comm));
+                root = a;
+                seperate.clear();
+                comm.clear();
+                right = true;
             }
-            if(input.at(i) == ';')
-            {
-                v.push_back(com);
-                v.push_back(";");
-                com = "";
-            }
-            else
-            {
-                if(i < input.size()-1 && input.at(i) == '&' && input.at(i+1)=='&')  //&&
-                {
-                    i++;
-                    v.push_back(com);
-                    v.push_back("&&");
-                    com = "";
+            else {   
+                if (cmd.at(i + 1).find("test") == 0) {
+                    TestCommand* t = new TestCommand(cmd.at(i + 1));
+                    andConnector* a2 = new andConnector(root, t);
+                    root = a2;
                 }
-                else if(i < input.size()-1 && input.at(i) == '|' && input.at(i+1)=='|')     //||
-                {
-                    i++;
-                    v.push_back(com);
-                    v.push_back("||");
-                    com = "";
+                else if (cmd.at(i + 1).at(0) == '[') {
+                    tempcmd = "test";
+                
+                    for (unsigned j = 1; cmd.at(i + 1).at(j) != ']'; ++j) {
+                        tempcmd =tempcmd + cmd.at(i + 1).at(j);
+                    }
+
+                    TestCommand* t = new TestCommand(tempcmd);
+                    andConnector* a2 = new andConnector(root, t);
+                    root = a2;
                 }
-                else
-                    com += input.at(i);               //adds to the string to be read
+                else {
+                    Command* c1 = new Command(cmd.at(i + 1));
+                    andConnector* a2 = new andConnector(root, c1);
+                    root = a2;
+                }
+                right = true;
             }
         }
-        cin.clear();
-        v.push_back(com);
-        bool checker = false;                           //last command's truth value
-
-        for(unsigned i = 0; i< v.size(); i++)                         //read through v 
-        {
-            if(v.at(i) == "exit" )
-            {
-                return 0;
+        else if (cmd.at(i) == ";") {
+            if (i == cmd.size() - 1) {
+                SemiConnector* s = new SemiConnector(root);
+                root = s;
             }
-            if(v.at(i) == ";")
-            {
-                
+            else if (cmd.at(i + 1).at(0) == '(') {
+                x = cmd.at(i + 1);
+                x = x.substr(1, x.size() - 2);
+                rshell.parse(x, seperate);
+                rshell.compareCommands(seperate, comm);
+                SemiConnector* s1 = new SemiConnector(root,launch(comm));
+                root = s1;
+                seperate.clear();
+                comm.clear();
+                right = true;
             }
-            else if(v.at(i) == "&&" )
-            {
-                boost::trim_left(v.at(i+1));
-                andConnector* a = new andConnector(checker, v.at(i+1));
-                i++;                                   //skips v.at(i+1)
-                checker = a->getValidity();              //truth value of &&
-            }
-            else if(v.at(i) == "||" )
-            {
-                boost::trim_left(v.at(i+1));
-                orConnector* o = new orConnector(checker, v.at(i+1));
-                i++;                                    //skips v.at(i+1)
-                checker = o->getValidity();             //truth value of ||
-            }
-            else
-            {
-                boost::trim_left(v.at(i));
-                if(v.at(i) == "exit")
-                {
-                    return 0;
+            else {
+                if (cmd.at(i + 1).find("test") == 0) {
+                    TestCommand* t = new TestCommand(cmd.at(i + 1));
+                    SemiConnector* s2 = new SemiConnector(root, t);
+                    root = s2;
                 }
-                Command c(v.at(i));
-                c.launch();
-                checker = c.isValid();
-            }
+                else if (cmd.at(i + 1).at(0) == '[') {
+                    tempcmd = "test";
+                
+                    for (unsigned j = 1; cmd.at(i + 1).at(j) != ']'; ++j) {
+                        tempcmd =tempcmd + cmd.at(i + 1).at(j);
+                    }
 
+                    TestCommand* t = new TestCommand(tempcmd);
+                    SemiConnector* s2 = new SemiConnector(root, t);
+                    root = s2;
+                }
+                else {
+                    Command* c1 = new Command(cmd.at(i + 1));
+                    SemiConnector* s2 = new SemiConnector(root, c1);
+                    root = s2;
+                }
+                right = true;
+            }
+        }
+        else if (cmd.at(i) == "||") {
+            if (cmd.at(i + 1).at(0) == '(') {
+                x = cmd.at(i + 1);
+                x = x.substr(1, x.size() - 2);
+                rshell.parse(x, seperate);
+                rshell.compareCommands(seperate, comm);
+                orConnector* o2 = new orConnector(root,launch(comm));
+                root = o2;
+                seperate.clear();
+                comm.clear();
+                right = true;
+            }
+            else {
+                if (cmd.at(i + 1).find("test") == 0) {
+                    TestCommand* t = new TestCommand(cmd.at(i + 1));
+                    orConnector* o = new orConnector(root, t);
+                    root = o;
+                }
+                else if (cmd.at(i + 1).at(0) == '[') {
+                    tempcmd = "test";
+                
+                    for (unsigned j = 1; cmd.at(i + 1).at(j) != ']'; ++j) {
+                        tempcmd = tempcmd + cmd.at(i + 1).at(j);
+                    }
+
+                    TestCommand* t = new TestCommand(tempcmd);
+                    orConnector* o = new orConnector(root, t);
+                    root = o;
+                }
+                else {
+                    Command* c1 = new Command(cmd.at(i + 1));
+                    orConnector* o = new orConnector(root, c1);
+                    
+                    root = o;
+                }
+                
+                right = true;
+            }
+        }
+        else if (cmd.at(i).at(0) == '(') {
+            x = cmd.at(i);
+            x = x.substr(1, x.size() - 2);
+            
+            rshell.parse(x, seperate);
+            rshell.compareCommands(seperate, comm);
+            root = launch(comm);
+            seperate.clear();
+            comm.clear();
+        }
+        else {    
+            if (cmd.at(i).find("test") == 0) {
+                TestCommand* c = new TestCommand(cmd.at(i));
+                root = c;
+            }
+            else if (cmd.at(i).at(0) == '[') {
+                tempcmd = "test";
+                
+                for (unsigned j = 1; cmd.at(i).at(j) != ']'; ++j) {
+                    tempcmd =tempcmd + cmd.at(i).at(j);
+                }
+
+                TestCommand* c = new TestCommand(tempcmd);
+                root = c;
+            }
+            else {
+                Command* c = new Command(cmd.at(i));
+                root = c;
+            }
+            
         }
     }
-    return 0;
+    
+    return root;
 }
 
+int main() {	
+	r_shell rshell;
+	string input ="";
+	vector<string> v;
+	vector<string> cmd;
 
+	while(true) {
+	    
+        cout << "$ ";
+        getline(cin, input); 
+        
+        while(input == "") {
+            cout << "$ ";
+            getline(cin, input);
+        }
 
+        rshell.delete_comments(input);
+        rshell.parse(input, v);
+        rshell.compareCommands(v, cmd);
+        
+        Base* t1 = launch(cmd);
+        t1->run();
+        v.clear();
+        cmd.clear();
+    }
 
-
-
-
-
-
-
+	return 0;
+}

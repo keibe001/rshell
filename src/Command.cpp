@@ -1,97 +1,76 @@
 #include "Command.h"
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <stdio.h>
-#include<stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
+
+Command::Command() {}
 
 Command::Command(string command) {
-    input = command;
+    string tempCmd;
+    size_t x = command.find(" ");
+    char* tempCmdCStr = new char[500]; 
+    
+    if (x == string::npos) {
+        this->command = command;
+    }
+    else {
+        tempCmd = command; 
+        
+        this->command = tempCmd.substr(0, x);
+        tempCmd.erase(0, x + 1);
+        strcpy(tempCmdCStr, tempCmd.c_str());
+        char* temp= strtok(tempCmdCStr, " ");
+        
+        while (temp != NULL) {
+            user_flags.push_back(temp);
+            temp = strtok(NULL, " ");
+        }
+    }
 }
 
-void Command::launch() { 
-
-    if (input == "exit") {
-        abort(); 
+bool Command::run() {
+    if (command == "exit") {
+        exit(EXIT_SUCCESS);
     }
     
-    char** command_arr = new char*[1000];
-    string command_copy = input.substr(0,input.find(" "));
+    int status;
+    bool ran = true;
+    char* x[500];
+    char* temp = new char[100];
     
-    char *command_copy_2 = new char[input.length()]; 
-    char *command_copy_3 = new char[input.length()];
-    strcpy(command_copy_2,command_copy.c_str());
     
-    int x = 0; 
-    while (input.find(" ") < 1000) { // while no whitespace found
-        if(x == 0) {
-            command_arr[x] = command_copy_2;
-            x++;
-        }
-        
-        else {
-        command_copy = input.substr(0, input.find(" ")); 
-            strcpy(command_copy_3, command_copy.c_str());
-            command_arr[x] = command_copy_3; 
-            x++;
-        }
-        
-        input.erase(0,input.find(" ") + 1);
+    strcpy(temp, command.c_str());
+    x[0] = temp;
+    
+    if (user_flags.size() != 0) {
+		for (unsigned i = 1; i <= user_flags.size(); ++i) {
+			x[i] = user_flags[i - 1];
+		}
     }
     
-    if(!input.empty()) {
-        command_copy = input;
-        char *cmd = new char[input.length()];
-        strcpy(cmd,command_copy.c_str());
-        command_arr[x] = cmd;
-        delete[] cmd;
-    }
+    x[user_flags.size() + 1] = NULL; 
+    pid_t pid = fork();
     
-    command_arr[x+1] = 0; 
-    pid_t pid = fork(); 
-    int pidnum = 1; 
-    
-    //checks if processes output correctly 
     if (pid == -1) {
-        perror("Fork failed");
-        pidnum = -1; 
-        status = pidnum;
+        ran = false;
+        perror("fork() has failed");
+        exit(EXIT_FAILURE);
     }
-    
-    else if (pid == 0 && execvp(command_copy_2, command_arr)) {
-        perror("Execute failed");
-        pidnum = -1; 
-        status = pidnum;
-        return;
+    else if (pid == 0) {
+        if (execvp(command.c_str(), x) == -1) {
+            ran = false;
+            perror("execvp() has failed");
+            exit(EXIT_FAILURE);
+        }
     }
-    
     else if (pid > 0) {
-        if (wait(0) == -1) {
-            perror("Wait failed"); 
-            pidnum = -1;
-            status = pidnum;
+        if (waitpid(pid, &status, 0) == -1) {
+            perror("wait() has failed");
+        }
+        
+        if (WIFEXITED(status) == 1) {
+            if (WEXITSTATUS(status) != 0) {
+                ran = false;
+            }
         }
     }
     
-    delete[] command_arr;
-    delete[] command_copy_2;
-    delete[] command_copy_3;
-    status = pidnum;
-    return; 
-}
-
-bool Command::isValid() {
-    if(getStatus() == 1) {
-        validity = true; 
-        return validity;
-    }
-    
-    validity = false;
-    return validity;
-}
-
-int Command::getStatus() {
-    return status;
+    return ran;
 }
