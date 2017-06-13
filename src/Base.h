@@ -13,7 +13,13 @@
 #include <sys/wait.h>
 #include <unistd.h>                 //exec
 #include <iostream>
+#include <fstream>
 #include <vector>
+
+//open (redirect)
+#include <sys/stat.h>
+#include <fcntl.h>
+
 using namespace std;
 
 class Base {
