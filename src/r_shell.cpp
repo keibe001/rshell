@@ -44,6 +44,14 @@ void r_shell::compareCommands(const vector<string>& seperatedInput, vector<strin
             v.push_back("||");
         }
         
+        else if (seperatedInput.at(i).compare("|") == 0) {
+            if(!mod.empty()) {
+                v.push_back(mod);
+                mod.clear();
+            }
+            v.push_back("|");
+        }
+        
         else if (seperatedInput.at(i).compare(seperatedInput.at(i).size() - 1, 1, ";") == 0) {
             if (!mod.empty()) {
                 mod = mod + seperatedInput.at(i);

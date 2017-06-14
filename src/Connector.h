@@ -47,5 +47,15 @@ class orConnector : public Connector {
         bool run();
 };
 
+class PipeConnector : public Connector {
+    protected:
+        Base* left;
+        Base* right;
+        
+    public:
+        PipeConnector(Base* left, Command* right);
+        bool run();
+};
+
 
 #endif

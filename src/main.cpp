@@ -19,6 +19,11 @@ Base* launch(const vector<string>& cmd) {
         if (right) {
             right = false;
         }
+        else if (cmd.at(i) == "|") {
+            Command* c1 = new Command(cmd.at(i + 1));
+            PipeConnector* newPipe = new PipeConnector(root, c1);
+            root = newPipe;
+        }
         else if (cmd.at(i) == "&&") {
             if (cmd.at(i + 1).at(0) == '(') {
                 x = cmd.at(i + 1);

@@ -68,3 +68,35 @@ bool orConnector::run() {
     }
     return false;
 }
+
+PipeConnector::PipeConnector(Base* left, Command* right) {
+    this->left = left;
+    this->right = right;
+}
+
+bool PipeConnector::run(){
+    
+    int PipeConnectorFD[2]; // array that holds file descriptor
+    
+    
+    if (pipe(PipeConnectorFD) == -1) {
+        perror("pipe");
+        return false;
+    }    
+    
+    if (!left->run() || !right->run()) {
+        return false;
+    }
+    
+    if (close(PipeConnectorFD[1]) == -1) {
+        perror("close");
+        return false;
+    }
+    
+    if (close(PipeConnectorFD[0]) == -1) {
+        perror("close");
+        return false;
+    }
+    
+    return true;
+}
