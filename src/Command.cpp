@@ -7,8 +7,8 @@ Command::Command(string command) {
     size_t x = command.find(" ");
     char* tempCmdCStr = new char[500]; 
     
-    if (x == string::npos) //npos is a static member constant value with the greatest possible value for an element of type size_t.
-    {
+    if (x == string::npos) //npos is a static member constant value with the greatest 
+    {                           // possible value for an element of type size_t.
         this->command = command;
     }
     else 
@@ -73,8 +73,13 @@ bool Command::run() {
         exit(EXIT_FAILURE);
     }
     else if (pid == 0)  //This is done by the child process.
-    {                   
-        if (execvp(command.c_str(), x) == -1)   ///* If execvp returns, it must have failed. */
+    {  
+        // char const* fileName = "output.txt";
+        // int fd = open(fileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        // dup2(fd, 1);   // make stdout go to file
+        int blue = execvp(command.c_str(), x);
+        // close(fd);
+        if (blue == -1)   ///* If execvp returns, it must have failed. */
         {
             ran = false;
             perror("execvp() has failed");

@@ -84,6 +84,45 @@ void r_shell::compareCommands(const vector<string>& seperatedInput, vector<strin
             }
         }
         
+        //ReCommand < , > , >>
+        else if(seperatedInput.at(i) ==  "<" || seperatedInput.at(i) ==  ">" || seperatedInput.at(i) ==  ">>")
+        {
+            if(seperatedInput.at(i) ==  "<")
+            {
+                unsigned j = i+1;
+                
+                if(!mod.empty()) 
+                {
+                    v.push_back(mod);       //command cat, sort, etc
+                    mod.clear();
+                }
+                string pipes = "";
+                v.push_back("<");
+                while(j < seperatedInput.size() )                     //search for mirror >
+                {
+                    if(seperatedInput.at(j) == ">" || seperatedInput.at(j) == ">>" 
+                    || seperatedInput.at(j) == "&&" || seperatedInput.at(j) == "||" || seperatedInput.at(j) == ";" )
+                    {
+                        v.push_back(pipes);
+                        v.push_back(seperatedInput.at(j));
+                        i = j;
+                        break;
+                    }
+                    pipes += seperatedInput.at(j);
+                    j++;
+                }
+            }
+            else
+            {
+                if(!mod.empty()) 
+                {
+                    v.push_back(mod);
+                    mod.clear();
+                }
+                v.push_back(seperatedInput.at(i));
+            }
+        }
+        
         else if (seperatedInput.at(i) ==  "[") {
             bool p = false;
             unsigned q;
@@ -116,7 +155,7 @@ void r_shell::compareCommands(const vector<string>& seperatedInput, vector<strin
             v.push_back(mod);
             mod.clear();
         }
-        
+
         else {
             mod = mod + seperatedInput.at(i);
             mod = mod + " ";

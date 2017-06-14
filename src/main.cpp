@@ -1,5 +1,6 @@
 #include "Base.h"
 #include "Command.cpp"
+#include "ReCommand.cpp"
 #include "Connector.cpp"
 #include "r_shell.cpp"
 #include "TestCommand.cpp"
@@ -13,6 +14,7 @@ Base* launch(const vector<string>& cmd) {
     Base* root;
     bool right = false;
     
+
     for (unsigned i = 0; i < cmd.size(); ++i) {
         if (right) {
             right = false;
@@ -144,12 +146,15 @@ Base* launch(const vector<string>& cmd) {
             seperate.clear();
             comm.clear();
         }
+        
+            
         else {    
             if (cmd.at(i).find("test") == 0) {
                 TestCommand* c = new TestCommand(cmd.at(i));
                 root = c;
             }
-            else if (cmd.at(i).at(0) == '[') {
+            else if (cmd.at(i).at(0) == '[') 
+            {
                 tempcmd = "test";
                 
                 for (unsigned j = 1; cmd.at(i).at(j) != ']'; ++j) {
@@ -158,6 +163,73 @@ Base* launch(const vector<string>& cmd) {
 
                 TestCommand* c = new TestCommand(tempcmd);
                 root = c;
+            }
+            else if((i + 2 < cmd.size() ) && (cmd.at(i+1) == ">" || cmd.at(i+1) == ">>" || cmd.at(i+1) == "<" ) )   //redirection
+            {
+                if(cmd.at(i+1) == "<")                                                                              //input redirection
+                {
+                    if(i+4 < cmd.size())
+                    {
+                        if(i<cmd.size()-4 && cmd.at(i+3) == ">>")   //type 5
+                        {
+                            /*
+                            cmd.at(i)       = command
+                            cmd.at(i+1)     = '<'
+                            cmd.at(i+2)     = command2
+                            cmd.at(i+3)     = ">>"
+                            cmd.at(i+4)     = fileName
+                            */
+                            ReCommand* c5 = new ReCommand(cmd.at(i), cmd.at(i+2),cmd.at(i+4).c_str(),5);
+                            root = c5;
+                            i +=4;
+                        }
+                        else if(i<cmd.size()-4 && cmd.at(i+3) == ">")   //type 4
+                        {
+                            ReCommand* c4 = new ReCommand(cmd.at(i), cmd.at(i+2),cmd.at(i+4).c_str(),4);
+                            root = c4;
+                            i +=4;
+                        }
+                        else       //type 1
+                        {
+                            /*
+                                cmd.at(i)       = command
+                                cmd.at(i+1)     = '<' 
+                                cmd.at(i+2)     = fileName
+                            */
+                            ReCommand* c1 = new ReCommand(cmd.at(i),cmd.at(i+2).c_str(),1);
+                            root = c1;
+                            i+=2;
+                        }
+                    }
+                    else       //type 1
+                    {
+                        /*
+                            cmd.at(i)       = command
+                            cmd.at(i+1)     = '<' 
+                            cmd.at(i+2)     = fileName
+                        */
+                        ReCommand* c1 = new ReCommand(cmd.at(i),cmd.at(i+2).c_str(),1);
+                        root = c1;
+                        i+=2;
+                    }
+                }
+                /*
+                    cmd.at(i)       = command
+                    cmd.at(i+1)     = '>' or ">>"
+                    cmd.at(i+2)     = fileName
+                */
+                else if(cmd.at(i+1) == ">")         //type 2
+                {
+                    ReCommand* c2 = new ReCommand(cmd.at(i),cmd.at(i+2).c_str(),2);
+                    root = c2;
+                    i+=2;
+                }
+                else if(cmd.at(i+1) == ">>")        //type 3
+                {
+                    ReCommand* c3 = new ReCommand(cmd.at(i),cmd.at(i+2).c_str(),3);
+                    root = c3;
+                    i+=2;
+                }
             }
             else {
                 Command* c = new Command(cmd.at(i));
@@ -171,11 +243,13 @@ Base* launch(const vector<string>& cmd) {
 }
 
 int main() {	
-	r_shell rshell;
+	r_shell rshell;         
 	string input ="";
 	vector<string> v;
 	vector<string> cmd;
+    
 
+    
 	while(true) {
 	    
         cout << "$ ";
@@ -185,16 +259,28 @@ int main() {
             cout << "$ ";
             getline(cin, input);
         }
-
         rshell.delete_comments(input);
         rshell.parse(input, v);
         rshell.compareCommands(v, cmd);
-        
+        // for(unsigned i = 0; i <  cmd.size(); i ++)
+        // {
+        //     cout<<"\""<<cmd.at(i)<<"\""<<endl;
+        // }
+
         Base* t1 = launch(cmd);
         t1->run();
+
         v.clear();
         cmd.clear();
     }
 
 	return 0;
 }
+
+
+/*
+cat < input.txt | tr A-Z a-z | tee newOutputFile1 | tr a-z A-Z > newOutputFile2
+*/
+
+
+
