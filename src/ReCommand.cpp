@@ -4,12 +4,14 @@ ReCommand::ReCommand() {}
 
 ReCommand::ReCommand(string command, char const* fileName, int type) 
 {
+    // cout<<"command_2: "<<command<<endl;
     this->fileName = fileName;
     this->type = type;
-    string tempCmd;
+    // string tempCmd;
+    this->command = command;
     size_t x = command.find(" ");
     size_t y = command.find("|");
-    char* tempCmdCStr = new char[500]; 
+    // char* tempCmdCStr = new char[500]; 
     if( y == string::npos)
     {
         contains_pipe = false;
@@ -24,18 +26,18 @@ ReCommand::ReCommand(string command, char const* fileName, int type)
     }
     else 
     {
-        tempCmd = command; 
+        // tempCmd = command; 
         
-        this->command = tempCmd.substr(0, x);
-        tempCmd.erase(0, x + 1);
-        strcpy(tempCmdCStr, tempCmd.c_str());
-        char* temp= strtok(tempCmdCStr, " ");
+        // this->command = tempCmd.substr(0, x);
+        // tempCmd.erase(0, x + 1);
+        // strcpy(tempCmdCStr, tempCmd.c_str());
+        // char* temp= strtok(tempCmdCStr, " ");
         
-        while (temp != NULL) 
-        {
-            user_flags.push_back(temp);
-            temp = strtok(NULL, " ");
-        }
+        // while (temp != NULL) 
+        // {
+        //     user_flags.push_back(temp);
+        //     temp = strtok(NULL, " ");
+        // }
     }
     /*
         command = the string upto the first space
@@ -95,7 +97,7 @@ bool ReCommand::run() {
     char* x[500];
     char* temp = new char[100];
     //-------------------------------------------------------------------
-    //                      IMPLEMENT LATER
+    //                          PIPING
     //-------------------------------------------------------------------
     if(contains_pipe)
     {
@@ -194,6 +196,9 @@ bool ReCommand::run() {
             inFS.open(fileName);//added after it has been graded
             string text = "";
             string line = "";
+            // cout<< "command_4: "<< command<<endl;
+            // cout<<"user_flags"<<user_flags.at(0)<<endl;
+            // cout<< "fileName: "<< fileName<<endl;
             if(inFS.is_open())          //apending
             {
                 while(getline(inFS,line))
